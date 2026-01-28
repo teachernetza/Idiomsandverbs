@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Advanced English Hub | Teacher Netza</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-dark: #3730a3; --accent: #f59e0b;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+            --success: #10b981; --error: #ef4444; --border: #e2e8f0;
+        }
+        .dark-mode {
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; transition: 0.3s; padding-bottom: 50px; overflow-x: hidden; }
+        
+        /* Progress Bar */
+        #progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; background: transparent; z-index: 1001; }
+        #progress-bar { height: 100%; background: var(--success); width: 0%; transition: 0.4s; }
+
+        /* Navigation - Mobile Optimized */
+        nav { background: var(--card); padding: 0.8rem; display: flex; justify-content: center; align-items: center; gap: 8px; position: sticky; top: 6px; z-index: 1000; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .nav-btn { padding: 8px 12px; border: none; background: none; font-weight: 600; cursor: pointer; border-radius: 10px; color: var(--text); transition: 0.2s; font-size: 0.9rem; white-space: nowrap; }
+        .nav-btn.active { background: var(--primary); color: white; }
+        .theme-toggle { background: #e2e8f0; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: #1e293b; }
+
+        /* General Layout */
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 20px; min-height: 60vh; }
+        .page { display: none; animation: fadeEffect 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeEffect { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ---- NEW HOMEPAGE STYLES ---- */
+        .hero-section {
+            text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border-radius: 24px; margin-bottom: 3rem; box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.5);
+        }
+        .hero-section h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero-section p { font-size: 1.3rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+        
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; }
+        .module-card {
+            background: var(--card); padding: 2.5rem 1.5rem; border-radius: 24px; border: 1px solid var(--border);
+            text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+        }
+        .module-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
+        .module-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+        .module-card h3 { margin: 0.5rem 0; font-size: 1.5rem; color: var(--primary); }
+        .module-card p { color: var(--muted); }
+
+        /* ---- EXISTING TABS SYSTEM (Modified for Mobile) ---- */
+        .master-grid { display: grid; grid-template-columns: 280px 1fr; background: var(--card); border-radius: 24px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); min-height: 600px; }
+        .sidebar { background: var(--bg); border-right: 1px solid var(--border); overflow-y: auto; }
+        .tab-link { padding: 1.2rem; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; }
+        .tab-link:hover { background: rgba(79, 70, 229, 0.05); }
+        .tab-link.active { background: var(--card); color: var(--primary); border-left: 5px solid var(--primary); font-weight: 800; }
+        .content-body { padding: 3rem; position: relative; overflow-y: auto; }
+
+        /* Content Elements */
+        .term-title { font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--primary); }
+        .phonetic { font-family: monospace; color: var(--accent); font-size: 1.3rem; margin: 0.5rem 0; letter-spacing: 1px; }
+        .mistake-box { background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 12px; margin: 1.5rem 0; border-left: 5px solid #ef4444; font-size: 0.9rem; }
+        .dark-mode .mistake-box { background: #451a1a; color: #fca5a5; }
+        .btn-audio { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 50px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; margin: 1rem 0; transition: 0.2s;}
+        .btn-audio:hover { transform: scale(1.05); background: var(--primary-dark); }
+        .card-exam { background: var(--card); padding: 2rem; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        textarea { width: 100%; height: 180px; padding: 1.5rem; border-radius: 16px; border: 2px solid var(--border); background: var(--bg); color: var(--text); font-family: inherit; font-size: 1.1rem; resize: none; transition: 0.3s; box-sizing: border-box; }
+        textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+        .score-display { font-size: 3rem; font-weight: 800; color: var(--success); text-align: center; }
+        .option-btn { width: 100%; text-align: left; padding: 14px; margin: 10px 0; border: 1px solid var(--border); background: var(--card); color: var(--text); border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .option-btn:hover { border-color: var(--primary); }
+
+        /* Certificate */
+        #certificate { display: none; background: white; border: 10px double var(--primary); padding: 3rem; text-align: center; border-radius: 0; color: #1e293b; position: relative; margin-top: 3rem; }
+        #certificate h2 { font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--primary-dark); }
+
+        /* Footer */
+        footer { background: var(--card); color: var(--muted); padding: 4rem 2rem; text-align: center; margin-top: 5rem; border-top: 1px solid var(--border); }
+        .license-text { max-width: 800px; margin: 1rem auto; font-size: 0.8rem; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+
+        /* ---- MOBILE BREAKPOINTS ---- */
+        @media (max-width: 768px) {
+            .hero-section { padding: 3rem 1.5rem; }
+            .hero-section h1 { font-size: 2.2rem; }
+            nav { justify-content: flex-start; overflow-x: auto; padding: 10px; -webkit-overflow-scrolling: touch; }
+            .master-grid { grid-template-columns: 1fr; min-height: auto; }
+            .sidebar { max-height: 250px; border-right: none; border-bottom: 2px solid var(--border); }
+            .content-body { padding: 1.5rem; }
+            .term-title { font-size: 2rem; }
+            #certificate { padding: 1.5rem; border-width: 5px; }
+        }
+
+        @media print { nav, .btn-audio, .theme-toggle, .no-print, .hero-section, .module-grid { display: none !important; } .master-grid { display: block; border: none; box-shadow: none; } .sidebar { display: none; } .page { display: block !important; } .content-body { padding: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="progress-container"><div id="progress-bar"></div></div>
+
+<nav>
+    <button class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('pv')">🚀 Phrasal Verbs</button>
+    <button class="nav-btn" onclick="showPage('idioms')">💎 Idioms</button>
+    <button class="nav-btn" onclick="showPage('writing')">✍️ Writing Lab</button>
+    <button class="nav-btn" onclick="showPage('exam')">🏆 Exam</button>
+    <button class="theme-toggle" onclick="toggleDarkMode()">🌓</button>
+</nav>
+
+<div class="container">
+
+    <div id="home" class="page active">
+        <header class="hero-section">
+            <h1>Advanced English Mastery Hub</h1>
+            <p>Bridge the gap to C1 fluency. Master the nuance of professional phrasal verbs, modern business idioms, and refine your output.</p>
+        </header>
+
+        <div class="module-grid">
+            <div class="module-card" onclick="showPage('pv')">
+                <span class="module-icon">🚀</span>
+                <h3>Module 1: Phrasal Verbs</h3>
+                <p>Master 8 essential dynamic verbs for high-level professional contexts.</p>
+            </div>
+            <div class="module-card" onclick="showPage('idioms')">
+                <span class="module-icon">💎</span>
+                <h3>Module 2: Business Idioms</h3>
+                <p>Learn 7 key expressions used in modern agile work environments.</p>
+            </div>
+            <div class="module-card" onclick="showPage('writing')">
+                <span class="module-icon">✍️</span>
+                <h3>Writing & Audio Lab</h3>
+                <p>Produce your own examples and check natural rhythm with audio feedback.</p>
+            </div>
+            <div class="module-card" onclick="showPage('exam')">
+                <span class="module-icon">🏆</span>
+                <h3>Final Certification</h3>
+                <p>Test your fluency under time pressure and earn your course certificate.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="pv" class="page">
+        <div class="master-grid">
+            <div class="sidebar" id="pv-tabs"></div>
+            <div class="content-body" id="pv-content"></div>
+        </div>
+    </div>
+
+    <div id="idioms" class="page">
+        <div class="master-grid">
+            <div class="sidebar" id="idiom-tabs"></div>
+            <div class="content-body" id="idiom-content"></div>
+        </div>
+    </div>
+
+    <div id="writing" class="page">
+        <div class="card-exam">
+            <h2>✍️ Creative Production Lab</h2>
+            <p>Write a short paragraph using at least 3 items from today's class. Then, listen to your own production to check for rhythm and natural pauses.</p>
+            <textarea id="user-text" placeholder="e.g., Today we kicked off the meeting by coming up with new ideas..."></textarea>
+            <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn-audio" onclick="speak(document.getElementById('user-text').value)">🔊 Read my Paragraph</button>
+                <button class="nav-btn" style="border:1px solid var(--border)" onclick="document.getElementById('user-text').value=''">Clear Text</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="exam" class="page">
+        <div id="exam-intro" style="text-align:center; padding: 2rem 0;">
+            <h2>Final Fluency Exam</h2>
+            <p>You have 5 minutes to complete 15 challenges. Good luck!</p>
+            <h1 id="timer" style="font-size:3rem; color:var(--primary)">05:00</h1>
+            <button class="btn-audio" style="font-size:1.2rem; padding: 15px 30px;" onclick="startExam()">START EXAM</button>
+        </div>
+
+        <div id="exam-questions" style="display:none"></div>
+
+        <div id="exam-results" style="display:none">
+            <div class="score-display" id="final-score">0/15</div>
+            <div id="certificate">
+                <p style="text-transform:uppercase; letter-spacing:3px;">Certificate of Achievement</p>
+                <h2 id="cert-name">Advanced Learner</h2>
+                <p>Has demonstrated mastery over 15 Advanced Phrasal Verbs & Idioms</p>
+                <p><em>Certified by Teacher Netza, 2026</em></p>
+                <div style="font-size:0.8rem; margin-top:20px;">License: GNU GPL v3.0</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p><strong>Created by Teacher Netza, 2026</strong></p>
+    <p>Questions? <a href="mailto:teacher.netza.varo@gmail.com" style="color:var(--primary)">teacher.netza.varo@gmail.com</a></p>
+    <div class="license-text">
+        Copyright © 2026 Teacher Netza. Licensed under the <strong>GNU General Public License v3.0</strong>.<br>
+        This is free software: you can redistribute it and/or modify it under the terms of the GPL v3.0.
+    </div>
+</footer>
+
+<script>
+    // DATA LOADING
+    const data = {
+        pv: [
+            { term: "Come up with", ipa: "/kʌm ʌp wɪð/", icon: "💡", def: "To produce or suggest an idea/plan.", ex: "How did you come up with that solution?", mistake: "Don't say: 'Think in an idea'. Use 'Come up with'.", q: "We need to ___ a name for the new cat.", opts: ["come up with", "sign off on", "brush up on"], ans: 0 },
+            { term: "Brush up on", ipa: "/brʌʃ ʌp ɒn/", icon: "🖌️", def: "Improve knowledge of something forgotten.", ex: "I need to brush up on my French.", mistake: "Incorrect: 'Clean my skills'. Correct: 'Brush up on'.", q: "Before the trip, I'll ___ my Italian.", opts: ["follow through", "brush up on", "dive into"], ans: 1 },
+            { term: "Sign off on", ipa: "/saɪn ɒf ɒn/", icon: "✍️", def: "To give official approval.", ex: "The manager finally signed off on the budget.", mistake: "Avoid: 'Say yes to the budget' in professional contexts.", q: "The CEO must ___ the new proposal.", opts: ["sign off on", "weigh in on", "kick off"], ans: 0 },
+            { term: "Follow through", ipa: "/ˈfɒləʊ θruː/", icon: "🎯", def: "Continue an action until finished.", ex: "He never follows through with his promises.", mistake: "Don't just say 'finish'. 'Follow through' implies commitment.", q: "If you start a project, you must ___.", opts: ["circle back", "follow through", "double down"], ans: 1 },
+            { term: "Double down on", ipa: "/ˈdʌbl daʊn ɒn/", icon: "⏩", def: "Significantly increase effort/focus.", ex: "They are doubling down on AI research.", mistake: "Use this to show strong commitment, not just 'work harder'.", q: "We should ___ our green energy strategy.", opts: ["double down on", "cut corners", "touch base"], ans: 0 },
+            { term: "Weigh in on", ipa: "/weɪ ɪn ɒn/", icon: "⚖️", def: "To give an opinion in a discussion.", ex: "I'd like to weigh in on this matter.", mistake: "Avoid: 'Give my word'. Better: 'Weigh in on'.", q: "Can you ___ this design choice?", opts: ["kick off", "weigh in on", "brush up on"], ans: 1 },
+            { term: "Kick off", ipa: "/kɪk ɒf/", icon: "🚀", def: "To start an event or process officially.", ex: "The meeting kicks off at 10 AM.", mistake: "More professional than 'start' or 'begin' for events.", q: "Let's ___ the workshop with a game.", opts: ["kick off", "follow through", "sign off on"], ans: 0 },
+            { term: "Dive into", ipa: "/daɪv ˈɪntuː/", icon: "🏊", def: "To start something with great energy.", ex: "Let's dive into the data.", mistake: "Use for complex tasks that require deep focus.", q: "I can't wait to ___ this new project.", opts: ["dive into", "cut corners", "brush up on"], ans: 0 }
+        ],
+        idioms: [
+            { term: "On the same page", ipa: "/ɒn ðə seɪm peɪdʒ/", icon: "📖", def: "Thinking in a similar way.", ex: "Are we all on the same page?", mistake: "Don't say 'We are in the same page' (Preposition error).", q: "We need everyone ___ before we start.", opts: ["on the same page", "moving the needle", "cutting corners"], ans: 0 },
+            { term: "Touch base", ipa: "/tʌtʃ beɪs/", icon: "📡", def: "Briefly make contact to update someone.", ex: "Let's touch base next week.", mistake: "Common error: 'Talk you later'. Professional: 'Touch base'.", q: "I'll ___ with you after the weekend.", opts: ["circle back", "touch base", "hit the ground"], ans: 1 },
+            { term: "Move the needle", ipa: "/muːv ðə ˈniːdl/", icon: "📈", def: "Make a noticeable difference.", ex: "This change didn't move the needle.", mistake: "Used for results, not just effort.", q: "Our new ads didn't really ___.", opts: ["cut corners", "move the needle", "double down"], ans: 1 },
+            { term: "Cut corners", ipa: "/kʌt ˈkɔːnərz/", icon: "✂️", def: "Do something badly to save time/money.", ex: "Never cut corners on safety.", mistake: "Usually negative. It implies low quality.", q: "The roof leaked because they ___.", opts: ["cut corners", "hit the ground", "weighed in"], ans: 0 },
+            { term: "The ball is in your court", ipa: "/ðə bɔːl ɪz ɪn jɔːr kɔːrt/", icon: "🎾", def: "It is your turn to take action.", ex: "I've done my part; the ball is in your court.", mistake: "Used in negotiations or responsibilities.", q: "I've sent the email. Now, ___.", opts: ["the ball is in your court", "kick off", "circle back"], ans: 0 },
+            { term: "Hit the ground running", ipa: "/hɪt ðə ɡraʊnd ˈrʌnɪŋ/", icon: "🏃", def: "Start something with immediate success.", ex: "He hit the ground running at his new job.", mistake: "Don't say 'Start fast'. Use this for 'ready to succeed'.", q: "She has experience, so she'll ___.", opts: ["hit the ground running", "dive into", "follow through"], ans: 0 },
+            { term: "Circle back", ipa: "/ˈsɜːrkl bæk/", icon: "🔄", def: "Discuss a topic again later.", ex: "Let's circle back to this later.", mistake: "Ideal for meetings when you get off-topic.", q: "Can we ___ to this point later?", opts: ["circle back", "sign off", "brush up"], ans: 0 }
+        ]
+    };
+
+    let score = 0;
+    let answered = new Set();
+
+    // NAVIGATION FUNCTIONS
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // Highlight corresponding nav button
+        const navBtn = document.querySelector(`.nav-btn[onclick="showPage('${id}')"]`);
+        if (navBtn) navBtn.classList.add('active');
+        window.scrollTo(0, 0); // Reset scroll on page change
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+
+    // TAB SYSTEM FUNCTIONS
+    function loadTabs(list, gridId, contentId) {
+        const sidebar = document.getElementById(gridId);
+        list.forEach((item, i) => {
+            const el = document.createElement('div');
+            el.className = `tab-link ${i===0?'active':''}`;
+            el.innerHTML = `<span>${item.icon}</span> ${item.term}`;
+            el.onclick = () => {
+                document.querySelectorAll(`#${gridId} .tab-link`).forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+                renderContent(item, contentId);
+                if(window.innerWidth <= 768) {
+                     document.getElementById(contentId).scrollIntoView({behavior: "smooth"});
+                }
+            };
+            sidebar.appendChild(el);
+        });
+        renderContent(list[0], contentId);
+    }
+
+    function renderContent(item, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `
+            <div class="phonetic">${item.ipa}</div>
+            <h1 class="term-title">${item.term}</h1>
+            <button class="btn-audio" onclick="speak('${item.term}')">🔊 Hear Pronunciation</button>
+            <p style="font-size:1.2rem; line-height:1.6">${item.def}</p>
+            <div class="mistake-box"><strong>⚠️ Common Mistake:</strong><br>${item.mistake}</div>
+            <p style="background:var(--bg); padding:1rem; border-left:4px solid var(--accent); border-radius:8px;"><strong>Example:</strong> <em>"${item.ex}"</em></p>
+            <div style="background:var(--bg); padding:1.5rem; border-radius:15px; border:1px dashed var(--border); margin-top:2rem;">
+                <strong>Quick Practice:</strong>
+                <p style="margin-bottom:1rem;">${item.q}</p>
+                ${item.opts.map((o, i) => `<button class="option-btn" onclick="check(this,${i},${item.ans},'${item.term}')">${o}</button>`).join('')}
+            </div>
+        `;
+    }
+
+    function check(btn, sel, ans, term) {
+        if(sel === ans) {
+            btn.style.background = "#dcfce7"; btn.style.borderColor = "var(--success)"; color:"#166534";
+            if(!answered.has(term)) { score++; answered.add(term); updateProgress(); }
+        } else {
+            btn.style.background = "#fee2e2"; btn.style.borderColor = "var(--error)"; color:"#991b1b";
+        }
+    }
+
+    function updateProgress() {
+        const total = 15; const perc = (answered.size / total) * 100;
+        document.getElementById('progress-bar').style.width = perc + "%";
+    }
+
+    function speak(txt) {
+        const msg = new SpeechSynthesisUtterance(txt);
+        msg.lang = 'en-US'; msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // EXAM FUNCTIONS
+    let examTime = 300;
+    function startExam() {
+        document.getElementById('exam-intro').style.display = 'none';
+        document.getElementById('exam-questions').style.display = 'block';
+        const qContainer = document.getElementById('exam-questions');
+        const allItems = [...data.pv, ...data.idioms].sort(() => 0.5 - Math.random());
+        
+        qContainer.innerHTML = "<h2 style='text-align:center'>Complete the Quiz</h2>";
+        allItems.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = "card-exam";
+            div.innerHTML = `<p style='font-weight:bold; font-size:1.1rem;'>${idx+1}. ${item.q}</p>${item.opts.map((o,i) => `<button class='option-btn' onclick='checkExam(this,${i},${item.ans})'>${o}</button>`).join('')}`;
+            qContainer.appendChild(div);
+        });
+
+        const timer = setInterval(() => {
+            examTime--; let m = Math.floor(examTime/60); let s = examTime%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
+            if(examTime <= 0) { clearInterval(timer); finishExam(); }
+        }, 1000);
+    }
+
+    let examScore = 0;
+    function checkExam(btn, sel, ans) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('button').forEach(b => b.disabled = true);
+        if(sel === ans) { btn.style.background = "#dcfce7"; examScore++; }
+        else { btn.style.background = "#fee2e2"; }
+        if(document.querySelectorAll('#exam-questions .option-btn:disabled').length === 15*3) finishExam();
+    }
+
+    function finishExam() {
+        document.getElementById('exam-questions').style.display = 'none';
+        document.getElementById('exam-results').style.display = 'block';
+        document.getElementById('final-score').innerText = `${examScore} / 15`;
+        if(examScore >= 12) {
+            document.getElementById('certificate').style.display = 'block';
+            const name = prompt("Congratulations! Enter your name for the certificate:") || "Advanced Student";
+            document.getElementById('cert-name').innerText = name;
+        }
+    }
+
+    // Initialize
+    loadTabs(data.pv, 'pv-tabs', 'pv-content');
+    loadTabs(data.idioms, 'idiom-tabs', 'idiom-content');
+</script>
+</body>
+</html>
